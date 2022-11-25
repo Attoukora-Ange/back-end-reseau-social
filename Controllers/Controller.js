@@ -2,6 +2,7 @@ const UTILISATEURS = require("../Models/Utilisateurs");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const { createToken } = require("./Token");
+const cloudinary = require('../helper/upload');
 
 const LISTE_UTILISATEUR = async (res)=>{
   const LISTE_UTILISATEUR = await UTILISATEURS.find().sort({pseudo : 1});
@@ -54,16 +55,22 @@ module.exports.GET_LISTE_UTILISATEUR = async (req, res) => {
 
 module.exports.PATCH_MODIFIER_PHOTO_PROFIL = async (req, res)=>{
   const ID_CONNTECTER = req.user?.payload
-  const photo_profil = req.file?.filename
+  let photo_profil = req.file?.filename
   if(!photo_profil) return res.status(400).json({erreur_photo: 'Veuillez selectionner une photo'})
-try {
+  
+  try {
+  console.log('premier' + req.file.path)
+  photo_profil = await cloudinary.uploader.upload(req.file.path, {folder: 'socialPharma36'});
+  console.log('deuxieme' + photo_profil)
+  photo_profil = photo_profil.secure_url;
+  console.log('troisieme' + photo_profil)
   const UTILISATEUR  = await UTILISATEURS.findByIdAndUpdate(ID_CONNTECTER, {photo_profil})
   UTILISATEUR.password = ""; //Vider le contenu de password
   UTILISATEUR.verification = ""; //Vider le contenu de la verification
   UTILISATEUR.PasseGenere = ""; //Vider le contenu de passeGene
  return res.status(200).json({UTILISATEUR})
 } catch (error) {
-  
+  console.log(error)
   return res
   .status(500)
   .json({ erreur_server: `Le server à rencontré un problème` });
@@ -71,9 +78,12 @@ try {
 }
 module.exports.PATCH_MODIFIER_PHOTO_COUVERTURE = async (req, res)=>{
   const ID_CONNTECTER = req.user?.payload
-  const photo_couverture = req.file?.filename
+  // const photo_couverture = req.file?.filename
+  let photo_couverture = req.file?.filename
   if(!photo_couverture) return res.status(400).json({erreur_photo: 'Veuillez selectionner une photo'})
 try {
+  photo_couverture = await cloudinary.uploader.upload(req.file.path, {folder: 'socialPharma36'});
+  photo_couverture = photo_couverture.secure_url;
  const UTILISATEUR = await UTILISATEURS.findByIdAndUpdate(ID_CONNTECTER, {photo_couverture})
   UTILISATEUR.password = ""; //Vider le contenu de password
   UTILISATEUR.verification = ""; //Vider le contenu de la verification

@@ -25,24 +25,37 @@ const {
 const multer = require("multer");
 
 // CONFIGURATION DE MULTER
+/**Ici ce code est valable seulement en developpement */
+// const storage = (chemin) => {
+//   return multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, chemin);
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, file.originalname.split(" ").join("_"));
+//     },
+//   });
+// };
 
-const storage = (chemin) => {
-  return multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, chemin);
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname.split(" ").join("_"));
-    },
-  });
+
+// CONFIGURATION DE MULTER
+/**Ici ce code est valable seulement en production */
+const storage = () => {
+  return multer.diskStorage({});
 };
+
 const CHEMIN_PHOTO = [
-  process.env.CHEMIN_PREMIER,
-  process.env.CHEMIN_DEUXIEME,
+  "../client/public/assets/images/profil",
+  "../client/public/assets/images/couverture",
   ,
 ];
-const upload_photo_profil = multer({ storage: storage(CHEMIN_PHOTO[0]) });
-const upload_photo_couverture = multer({ storage: storage(CHEMIN_PHOTO[1]) });
+/** Valable seulement en developpement */
+// const upload_photo_profil = multer({ storage: storage(CHEMIN_PHOTO[0]) });
+// const upload_photo_couverture = multer({ storage: storage(CHEMIN_PHOTO[1]) });
+
+/** Valable seulement en production */
+const upload_photo_profil = multer({ storage: storage() });
+const upload_photo_couverture = multer({ storage: storage() });
 
 // LES GET
 ROUTE.get("/liste/utilisateur", GET_LISTE_UTILISATEUR);

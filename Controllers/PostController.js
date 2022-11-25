@@ -1,6 +1,7 @@
 const POSTER_UTILISATEURS = require("../Models/Posts");
 const UTILISATEURS = require("../Models/Utilisateurs");
 const { validationResult } = require("express-validator");
+const cloudinary = require('../helper/upload');
 
 module.exports.GET_LISTE_POSTER = async (req, res) => {
   try {
@@ -19,7 +20,6 @@ module.exports.GET_LISTE_POSTER = async (req, res) => {
 };
 //post image et le texte du post
 module.exports.POST_POSTER = async (req, res) => {
-  console.log(req.file)
   const ID_CONNTECTER = req.user?.payload;
   if(!ID_CONNTECTER) 
   return console.log('ID_CONNECT :' + ID_CONNTECTER);
@@ -35,18 +35,21 @@ module.exports.POST_POSTER = async (req, res) => {
       NEW_POSTER_TEXTE.save();
     }
     if (req.file?.mimetype == "image/png" || req.file?.mimetype ==  "image/jpeg"  || req.file?.mimetype ==  "image/jpg") {
-     
       if(post_texte !=  'undefined'){
+       let postPhoto = await cloudinary.uploader.upload(req.file.path, {folder: 'socialPharma36'});
+        postPhoto = postPhoto.secure_url;
         const NEW_POSTER_IMAGE = new POSTER_UTILISATEURS({
         posterId: ID_CONNTECTER,
         postTexte: post_texte,
-        postPhoto: req.file.filename,
+        postPhoto: postPhoto,
       });
       NEW_POSTER_IMAGE.save();
       }else{
+       let postPhoto = await cloudinary.uploader.upload(req.file.path, {folder: 'socialPharma36'});
+        postPhoto = postPhoto.secure_url;
         const NEW_POSTER_IMAGE = new POSTER_UTILISATEURS({
           posterId: ID_CONNTECTER,
-          postPhoto: req.file.filename,
+          postPhoto: postPhoto,
         });
         NEW_POSTER_IMAGE.save();
       }
@@ -54,17 +57,22 @@ module.exports.POST_POSTER = async (req, res) => {
     }
     if (req.file?.mimetype == "video/mp4") {
       if(post_texte != 'undefined'){
+      let postVideo = await cloudinary.uploader.upload(req.file.path, {resource_type:'video', folder: 'socialPharma36'});
+        console.log(postVideo)
+        postVideo = postVideo.secure_url;
          const NEW_POSTER_VIDEO = new POSTER_UTILISATEURS({
         posterId: ID_CONNTECTER,
         postTexte: post_texte,
-        postVideo: req.file.filename,
+        postVideo: postVideo,
       });
 
       NEW_POSTER_VIDEO.save();
       }else{
+        let postVideo = await cloudinary.uploader.upload(req.file.path, {resource_type:'video',folder: 'socialPharma36'});
+        postVideo = postVideo.secure_url;
         const NEW_POSTER_VIDEO = new POSTER_UTILISATEURS({
           posterId: ID_CONNTECTER,
-          postVideo: req.file.filename,
+          postVideo: postVideo,
         });
   
         NEW_POSTER_VIDEO.save();

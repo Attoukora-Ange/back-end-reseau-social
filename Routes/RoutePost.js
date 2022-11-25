@@ -12,19 +12,26 @@ const { body } = require("express-validator");
 const multer = require("multer");
 
 // CONFIGURATION DE MULTER
-
-const storage = (chemin) => {
-  return multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, chemin);
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname.split(" ").join("_"));
-    },
-  });
+/**Seulement en developpement */
+// const storage = (chemin) => {
+//   return multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, chemin);
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, file.originalname.split(" ").join("_"));
+//     },
+//   });
+// };
+/**Seulement en production */
+const storage = () => {
+  return multer.diskStorage({});
 };
-const CHEMIN_PHOTO = [process.env.CHEMIN_POST];
-const upload_post = multer({ storage: storage(CHEMIN_PHOTO[0]), limits: { fileSize: 3000000 } });
+// const CHEMIN_PHOTO = [process.env.CHEMIN_POST];
+/**Seulement en developement */
+// const CHEMIN_PHOTO = ["../client/public/assets/images/post"];
+// const upload_post = multer({ storage: storage(CHEMIN_PHOTO[0]), limits: { fileSize: 3000000 } });
+const upload_post = multer({ storage: storage(), limits: { fileSize: 3000000 } });
 
 ROUTE_POST.get("/poster", GET_LISTE_POSTER);
 

@@ -1,11 +1,11 @@
 const express = require("express");
+require("dotenv").config();
 const ROUTE = require("./Routes/Route");
 const morgan = require("morgan");
 const cors = require("cors");
 const cookie = require("cookie-parser");
 const { verifieTokenJWT, verifieToken } = require("./Controllers/Token");
 const ROUTE_POST = require("./Routes/RoutePost");
-require("dotenv").config();
 require("./Data/Data");
 const path = require('path');
 const app = express();
@@ -27,7 +27,6 @@ const socketIO = new Server(server, {cors:{option}});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(morgan("tiny"));
 
   app.use(
     cors(option)
@@ -39,17 +38,14 @@ app.use(express.urlencoded({ extended: true }));
     app.use("/api", ROUTE);
     app.use("/api", ROUTE_POST);
    
-    const ActiveUser = []
+  
     socketIO.on('connection', (socket) => {
-      console.log(` ${socket.id} user just connected!`);
-
+     
       socket.on('entrer_groupe', (groupe)=>{
         socket.join(groupe)
-        console.log(socket.rooms)
       })
 
       socket.on('message', (msg)=>{
-        console.log(msg)
         socketIO.in(msg.groupe).emit('sever_message', msg)
       })
 
@@ -63,15 +59,10 @@ app.use(express.urlencoded({ extended: true }));
             userId : msg.id,
             socketId : socket.id
           })
-          console.log(msg)
           socketIO.emit('server_user_connect', ActiveUser)
         }
       }) 
 
-    
-      socket.on('disconnect', () => {
-        console.log('A user disconnected');
-      });
   });
     const port = process.env.PORT || 5000;
    server.listen(port, () => console.log(`Server connecté au port ${port}!`));
